@@ -1,5 +1,11 @@
-
+﻿
+using JobPortal1.O.DTOs;
+using JobPortal1.O.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace JobPortal1.O
 {
@@ -11,15 +17,70 @@ namespace JobPortal1.O
 
             // Add services to the container.
 
+
+            // 🔥 JWT Authentication Config
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    };
+                });
+
+            // 🔥 Authorization Setup
+            builder.Services.AddAuthorization();
+
+            builder.Services.AddScoped<AuthService>();
+
+
             // ?? Register DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            builder.Services.AddSwaggerGen();
+            
             // ?? Add Controllers
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                 .AddApplicationPart(typeof(RegisterRequest).Assembly);
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "JobPortal API", Version = "v1" });
 
-           
+                // 🔥 Enable JWT Authentication in Swagger
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter 'Bearer' followed by space and the token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+            });
+
+
+
 
             var app = builder.Build();
 
@@ -32,7 +93,8 @@ namespace JobPortal1.O
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseAuthentication(); // 👈 JWT Authentication Middleware
+            app.UseAuthorization();  // 👈 Authorization Middleware
 
 
             app.MapControllers();
