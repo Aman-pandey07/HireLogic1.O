@@ -148,3 +148,4 @@ C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.pdb
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.genruntimeconfig.cache
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\ref\JobPortal1.O.dll
+C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

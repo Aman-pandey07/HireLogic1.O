@@ -20,12 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="JobPortal\Data\" />
-    <Folder Include="JobPortal\DTOs\" />
-    <Folder Include="JobPortal\Infrastructure\" />
-    <Folder Include="JobPortal\Models\" />
-    <Folder Include="JobPortal\Repositories\" />
-    <Folder Include="JobPortal\Services\" />
+    <Folder Include="Data\" />
+    <Folder Include="DTOs\" />
+    <Folder Include="Infrastructure\" />
+    <Folder Include="Models\" />
+    <Folder Include="Repositories\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
