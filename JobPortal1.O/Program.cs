@@ -1,5 +1,6 @@
-﻿
-using JobPortal1.O.DTOs;
+﻿using JobPortal1.O.DTOs;
+using JobPortal1.O.Repositories.Implementation;
+using JobPortal1.O.Repositories.Interface;
 using JobPortal1.O.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +16,20 @@ namespace JobPortal1.O
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // ✅ 1. Register Services
+            RegisterServices(builder);
 
+            var app = builder.Build();
 
-            // 🔥 JWT Authentication Config
+            // ✅ 2. Configure Middleware
+            ConfigureMiddleware(app);
+
+            app.Run();
+        }
+
+        private static void RegisterServices(WebApplicationBuilder builder)
+        {
+            // ✅ Authentication Setup (JWT)
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -34,18 +45,23 @@ namespace JobPortal1.O
                     };
                 });
 
-            // 🔥 Authorization Setup
+            // ✅ Authorization Setup
             builder.Services.AddAuthorization();
 
+            // ✅ Register Repositories
+            builder.Services.AddScoped<IJobRepository, JobRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+
+            // ✅ Register Services
             builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<ApplicationsDetailService>();
 
-
-            // ?? Register DbContext
+            // ✅ Register DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            
-            // ?? Add Controllers
+            // ✅ Register Controllers
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -53,15 +69,21 @@ namespace JobPortal1.O
                     options.JsonSerializerOptions.WriteIndented = true; // For better JSON formatting
                 })
                 .AddApplicationPart(typeof(RegisterRequest).Assembly);
+
+            // ✅ Swagger Setup
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "JobPortal API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "JobPortal API",
+                    Version = "v1"
+                });
 
-                // 🔥 Enable JWT Authentication in Swagger
+                // ✅ Enable JWT in Swagger
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
-                    Description = "Please enter 'Bearer' followed by space and the token",
+                    Description = "Enter 'Bearer' followed by the token",
                     Name = "Authorization",
                     Type = SecuritySchemeType.Http,
                     BearerFormat = "JWT",
@@ -69,28 +91,25 @@ namespace JobPortal1.O
                 });
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
             });
-            builder.Services.AddScoped<ApplicationsDetailService>();
+        }
 
-
-
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
+        private static void ConfigureMiddleware(WebApplication app)
+        {
+            // ✅ Environment-Specific Middleware
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -99,13 +118,14 @@ namespace JobPortal1.O
 
             app.UseHttpsRedirection();
 
-            app.UseAuthentication(); // 👈 JWT Authentication Middleware
-            app.UseAuthorization();  // 👈 Authorization Middleware
+            // ✅ JWT Authentication Middleware
+            app.UseAuthentication();
 
+            // ✅ Authorization Middleware
+            app.UseAuthorization();
 
+            // ✅ Map Controllers
             app.MapControllers();
-
-            app.Run();
         }
     }
 }

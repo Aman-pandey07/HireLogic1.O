@@ -1,4 +1,6 @@
-﻿using JobPortal1.O.Models;
+﻿using JobPortal1.O.DTOs.Common;
+using JobPortal1.O.Models;
+using JobPortal1.O.Repositories.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,84 +13,86 @@ namespace JobPortal1.O.Controllers
     [Authorize]
     public class JobController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IJobRepository _jobRepository;
 
-        public JobController(ApplicationDbContext context)
+        public JobController(IJobRepository jobRepository)
         {
-            _context = context;
+            _jobRepository = jobRepository;
         }
 
+        // ✅ 1. Get All Jobs
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetAllJobs()
         {
-            var jobs = await _context.Jobs.Include(j => j.Employer).ToListAsync();
-            return Ok(jobs);
+            var jobs = await _jobRepository.GetAllJobsAsync();
+
+            if (!jobs.Any())
+                return NotFound(new ApiResponse<string>(false, "No jobs available", null));
+
+            return Ok(new ApiResponse<List<Job>>(true, "Jobs fetched successfully", jobs));
         }
 
+        // ✅ 2. Get Job by ID
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetJobById(int id)
         {
-            var job = await _context.Jobs
-                .Include(j => j.Employer)
-                .FirstOrDefaultAsync(j => j.Id == id);
-            return Ok(job);
+            var job = await _jobRepository.GetJobByIdAsync(id);
+
+            if (job == null)
+                return NotFound(new ApiResponse<string>(false, "Job not found", null));
+
+            return Ok(new ApiResponse<Job>(true, "Job fetched successfully", job));
         }
-        
-        
+
+        // ✅ 3. Create Job
         [HttpPost]
         [Authorize(Roles = "Employer")]
         public async Task<IActionResult> CreateJob(Job job)
         {
             if (job == null)
-                return BadRequest("Invalid job data");
+                return BadRequest(new ApiResponse<string>(false, "Invalid job data", null));
 
-            _context.Jobs.Add(job);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetJobById), new { id = job.Id }, job);
+            await _jobRepository.CreateJobAsync(job);
+            return CreatedAtAction(nameof(GetJobById), new { id = job.Id },
+                new ApiResponse<Job>(true, "Job created successfully", job));
         }
 
-        // ✅ Update Job
+        // ✅ 4. Update Job
         [HttpPut("{id}")]
-        [Authorize(Roles = "Employer")] // 🔥 Only Employers can update jobs
+        [Authorize(Roles = "Employer,Admin")]
         public async Task<IActionResult> UpdateJob(int id, Job updatedJob)
         {
             if (id != updatedJob.Id)
-                return BadRequest("Job ID mismatch");
+                return BadRequest(new ApiResponse<string>(false, "Job ID mismatch", null));
 
-            var existingJob = await _context.Jobs.FindAsync(id);
+            var existingJob = await _jobRepository.GetJobByIdAsync(id);
             if (existingJob == null)
-                return NotFound("Job not found");
+                return NotFound(new ApiResponse<string>(false, "Job not found", null));
 
             existingJob.Title = updatedJob.Title;
             existingJob.Description = updatedJob.Description;
             existingJob.Salary = updatedJob.Salary;
+            existingJob.EmployerId = updatedJob.EmployerId;
 
-            _context.Jobs.Update(existingJob);
-            await _context.SaveChangesAsync();
+            var result = await _jobRepository.UpdateJobAsync(existingJob);
+            if (result == null)
+                return NotFound(new ApiResponse<string>(false, "Job not found", null));
 
-            return NoContent();
+            return Ok(new ApiResponse<Job>(true, "Job updated successfully", updatedJob));
         }
 
-        // ✅ Delete Job
+        // ✅ 5. Delete Job
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Employer")] // 🔥 Only Employers can delete jobs
+        [Authorize(Roles = "Employer")]
         public async Task<IActionResult> DeleteJob(int id)
         {
-            var job = await _context.Jobs.FindAsync(id);
-            if (job == null)
-                return NotFound("Job not found");
+            var result = await _jobRepository.DeleteJobAsync(id);
+            if (!result)
+                return NotFound(new ApiResponse<string>(false, "Job not found", null));
 
-            _context.Jobs.Remove(job);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok(new ApiResponse<string>(true, "Job deleted successfully", null));
         }
-
-
-
-
-
     }
 }

@@ -1,4 +1,6 @@
-﻿using JobPortal1.O.Models;
+﻿using JobPortal1.O.DTOs.Common;
+using JobPortal1.O.Models;
+using JobPortal1.O.Repositories.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,71 +12,64 @@ namespace JobPortal1.O.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUserRepository _userRepository;
 
-        public UserController(ApplicationDbContext context)
+        public UserController(IUserRepository userRepository)
         {
-            _context = context;
+            _userRepository = userRepository;
         }
 
-        //this is tee code to get all user only admin access
+        // ✅ 1. Get All Users
         [HttpGet]
-        [Authorize(Roles ="Admin")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUsers()
         {
-            var users = await _context.Users.ToListAsync();
-            return Ok(users);
+            var users = await _userRepository.GetAllUsersAsync();
+
+            if (!users.Any())
+                return NotFound(new ApiResponse<string>(false, "No users found", null));
+
+            return Ok(new ApiResponse<List<User>>(true, "Users fetched successfully", users));
         }
 
-        //this is the code to get all user by id
+        // ✅ 2. Get User by ID
         [HttpGet("{id}")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<User>>> GetUser(int id)
+        public async Task<IActionResult> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound("User Not Found");
+            var user = await _userRepository.GetUserByIdAsync(id);
 
-            return Ok(user);
+            if (user == null)
+                return NotFound(new ApiResponse<string>(false, "User not found", null));
+
+            return Ok(new ApiResponse<User>(true, "User fetched successfully", user));
         }
 
-
+        // ✅ 3. Update User
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateUser(int id,User updatedUser)
+        public async Task<IActionResult> UpdateUser(int id, User updatedUser)
         {
-            if (id != updatedUser.Id) return BadRequest("The User Id Mismatch");
+            if (id != updatedUser.Id)
+                return BadRequest(new ApiResponse<string>(false, "User ID mismatch", null));
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound("User not found");
+            var result = await _userRepository.UpdateUserAsync(updatedUser);
+            if (result == null)
+                return NotFound(new ApiResponse<string>(false, "User not found", null));
 
-            // Only allow user to update their own data
-            var loggedInUserId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value ?? "0");
-            if (loggedInUserId != id)
-                return Forbid("You can only update your own profile");
-
-            user.Name = updatedUser.Name;
-            user.Email = updatedUser.Email;
-            user.PasswordHash = updatedUser.PasswordHash;
-            user.Role = updatedUser.Role;
-
-            _context.Entry(user).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return NoContent(); // 204 - No Content
+            return Ok(new ApiResponse<User>(true, "User updated successfully", updatedUser));
         }
 
+        // ✅ 4. Delete User
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound("User not found");
+            var result = await _userRepository.DeleteUserAsync(id);
+            if (!result)
+                return NotFound(new ApiResponse<string>(false, "User not found", null));
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok(new ApiResponse<string>(true, "User deleted successfully", null));
         }
-
     }
 }

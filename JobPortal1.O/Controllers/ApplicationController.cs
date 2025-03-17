@@ -2,6 +2,7 @@
 using JobPortal1.O.DTOs.ApplicationDtos;
 using JobPortal1.O.DTOs.Common;
 using JobPortal1.O.Models;
+using JobPortal1.O.Repositories.Interface;
 using JobPortal1.O.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,38 +17,30 @@ namespace JobPortal1.O.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ApplicationsDetailService _applicationsDetailService;
+        private readonly IApplicationRepository _applicationRepository;
 
-        public ApplicationController(ApplicationDbContext context,ApplicationsDetailService applicationsDetailService)
+
+        public ApplicationController(ApplicationDbContext context,ApplicationsDetailService applicationsDetailService, IApplicationRepository applicationRepository)
         {
             _context = context;
             _applicationsDetailService = applicationsDetailService;
+            _applicationRepository = applicationRepository;
         }
 
-        
 
-        // ✅ 1. Apply for a Job
+
         [HttpPost]
         [Authorize(Roles = "JobSeeker")]
-        public async Task<IActionResult> ApplyForJob([FromBody] ApplicationDTO dto)
+        public async Task<IActionResult> ApplyForJob(ApplicationDTO dto)
         {
-            if (!ModelState.IsValid) return BadRequest(new ApiResponse<string>(false, "Invalid input data", null));
+            var result = await _applicationRepository.ApplyForJobAsync(dto);
 
-            var job = await _context.Jobs.FindAsync(dto.JobId);
-            if (job == null) return NotFound(new ApiResponse<string>(false, "Job not found", null));
-
-            var application = new Application
-            {
-                JobId = dto.JobId,
-                UserId = dto.UserId,
-                ResumeUrl = dto.ResumeUrl,
-                Status = dto.Status ?? "Pending"
-            };
-
-            _context.Applications.Add(application);
-            await _context.SaveChangesAsync();
+            if (!result)
+                return BadRequest(new ApiResponse<string>(false, "Application failed", null));
 
             return Ok(new ApiResponse<string>(true, "Job Application Submitted Successfully", null));
         }
+
 
         // ✅ 2. Get All Applications
         [HttpGet]
