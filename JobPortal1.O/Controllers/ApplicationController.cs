@@ -1,5 +1,7 @@
 ﻿using JobPortal1.O.DTOs;
+using JobPortal1.O.DTOs.ApplicationDtos;
 using JobPortal1.O.Models;
+using JobPortal1.O.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +14,15 @@ namespace JobPortal1.O.Controllers
     public class ApplicationController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly ApplicationsDetailService _applicationsDetailService;
 
-        public ApplicationController(ApplicationDbContext context)
+        public ApplicationController(ApplicationDbContext context,ApplicationsDetailService applicationsDetailService)
         {
             _context = context;
+            _applicationsDetailService = applicationsDetailService;
         }
+
+        
 
         // ✅ 1. Apply for a Job
         [HttpPost]
@@ -45,12 +51,14 @@ namespace JobPortal1.O.Controllers
         // ✅ 2. Get All Applications
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetApplications()
+        public async Task<ActionResult<List<ApplicationDTO>>> GetApplications()
         {
-            var applications = await _context.Applications
-                                             .Include(a => a.User)
-                                             .Include(a => a.Job)
-                                             .ToListAsync();
+            var applications = await _applicationsDetailService.GetApplicationsAsync();
+
+            if (applications == null || !applications.Any())
+            {
+                return NoContent(); // 204 if no data found
+            }
 
             return Ok(applications);
         }
@@ -60,10 +68,7 @@ namespace JobPortal1.O.Controllers
         [Authorize]
         public async Task<IActionResult> GetApplication(int id)
         {
-            var application = await _context.Applications
-                                            .Include(a => a.User)
-                                            .Include(a => a.Job)
-                                            .FirstOrDefaultAsync(a => a.Id == id);
+            var application = await _applicationsDetailService.GetApplicationsAsyncById(id);
 
             if (application == null) return NotFound("Application not found");
 

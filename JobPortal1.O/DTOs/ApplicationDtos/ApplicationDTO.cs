@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace JobPortal1.O.DTOs;
+namespace JobPortal1.O.DTOs.ApplicationDtos;
 
 public class ApplicationDTO
 {

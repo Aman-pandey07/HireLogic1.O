@@ -83,6 +83,7 @@ namespace JobPortal1.O
         }
     });
             });
+            builder.Services.AddScoped<ApplicationsDetailService>();
 
 
 
