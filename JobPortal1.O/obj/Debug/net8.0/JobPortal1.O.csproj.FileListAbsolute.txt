@@ -1,3 +1,11 @@
+C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.csproj.AssemblyReference.cache
+C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.AssemblyInfoInputs.cache
+C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.AssemblyInfo.cs
+C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.csproj.CoreCompileInputs.cache
+C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.sourcelink.json
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\bin\Debug\net8.0\appsettings.json
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\bin\Debug\net8.0\JobPortal1.O.staticwebassets.endpoints.json
@@ -124,14 +132,6 @@ C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\bin
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
-C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.csproj.AssemblyReference.cache
-C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.AssemblyInfoInputs.cache
-C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.AssemblyInfo.cs
-C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.csproj.CoreCompileInputs.cache
-C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\JobPortal1.O.sourcelink.json
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\scopedcss\bundle\JobPortal1.O.styles.css
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\Aman\Desktop\NewProject\MicroservicesDemo\JobPortal1.O\JobPortal1.O\obj\Debug\net8.0\staticwebassets.development.json

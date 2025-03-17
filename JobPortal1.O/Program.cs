@@ -47,7 +47,12 @@ namespace JobPortal1.O
             
             // ?? Add Controllers
             builder.Services.AddControllers()
-                 .AddApplicationPart(typeof(RegisterRequest).Assembly);
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+                    options.JsonSerializerOptions.WriteIndented = true; // For better JSON formatting
+                })
+                .AddApplicationPart(typeof(RegisterRequest).Assembly);
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "JobPortal API", Version = "v1" });
