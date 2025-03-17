@@ -1,5 +1,6 @@
 ﻿using JobPortal1.O.DTOs;
 using JobPortal1.O.DTOs.ApplicationDtos;
+using JobPortal1.O.DTOs.Common;
 using JobPortal1.O.Models;
 using JobPortal1.O.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -29,10 +30,10 @@ namespace JobPortal1.O.Controllers
         [Authorize(Roles = "JobSeeker")]
         public async Task<IActionResult> ApplyForJob([FromBody] ApplicationDTO dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(new ApiResponse<string>(false, "Invalid input data", null));
 
             var job = await _context.Jobs.FindAsync(dto.JobId);
-            if (job == null) return NotFound("Job not found");
+            if (job == null) return NotFound(new ApiResponse<string>(false, "Job not found", null));
 
             var application = new Application
             {
@@ -45,22 +46,22 @@ namespace JobPortal1.O.Controllers
             _context.Applications.Add(application);
             await _context.SaveChangesAsync();
 
-            return Ok(application);
+            return Ok(new ApiResponse<string>(true, "Job Application Submitted Successfully", null));
         }
 
         // ✅ 2. Get All Applications
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<ApplicationDTO>>> GetApplications()
+        public async Task<ActionResult<List<ApplicationListDTO>>> GetApplications()
         {
             var applications = await _applicationsDetailService.GetApplicationsAsync();
 
             if (applications == null || !applications.Any())
             {
-                return NoContent(); // 204 if no data found
+                return NotFound(new ApiResponse<string>(false, "No Data Found" , null)); // 204 if no data found
             }
 
-            return Ok(applications);
+            return Ok(new ApiResponse<List<ApplicationListDTO>>(true, "Applications fetched successfully", applications));
         }
 
         // ✅ 3. Get Application by ID
@@ -70,14 +71,14 @@ namespace JobPortal1.O.Controllers
         {
             var application = await _applicationsDetailService.GetApplicationsAsyncById(id);
 
-            if (application == null) return NotFound("Application not found");
-
-            return Ok(application);
+            if (application == null) return
+                    NotFound(new ApiResponse<string>(false, "Application not found", null));
+            return Ok(new ApiResponse<ApplicationListDTO>(true, "Application fetched successfully", application));
         }
 
         // ✅ 4. Get Applications by User ID
         [HttpGet("user/{userId}")]
-        [Authorize(Roles = "JobSeeker")]
+        [Authorize(Roles = "Employer,Admin")]
         public async Task<IActionResult> GetApplicationsByUserId(int userId)
         {
             var applications = await _context.Applications
@@ -107,13 +108,15 @@ namespace JobPortal1.O.Controllers
         public async Task<IActionResult> UpdateApplicationStatus(int id, [FromBody] UpdateStatusDto dto)
         {
             var application = await _context.Applications.FindAsync(id);
-            if (application == null) return NotFound("Application not found");
+            if (application == null) return NotFound(new ApiResponse<String>(false, "Application not Found", null));  //"Application not found"
 
             application.Status = dto.Status;
             await _context.SaveChangesAsync();
 
-            return Ok(application);
+            return Ok(new ApiResponse<string>(true, "Status updated successfully", null));
         }
+            
+        
 
         // ✅ 7. Delete Application
         [HttpDelete("{id}")]
@@ -121,7 +124,7 @@ namespace JobPortal1.O.Controllers
         public async Task<IActionResult> DeleteApplication(int id)
         {
             var application = await _context.Applications.FindAsync(id);
-            if (application == null) return NotFound("Application not found");
+            if (application == null) return NotFound(new ApiResponse<String>(false, "Application not Found", null));
 
             _context.Applications.Remove(application);
             await _context.SaveChangesAsync();
